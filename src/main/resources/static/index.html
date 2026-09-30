@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student API Tester</title>
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --panel: #ffffff;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --border: #dfe7f5;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px 60px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 18px;
+            font-size: 1.4rem;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 14px;
+        }
+
+        label {
+            margin-bottom: 7px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        input, textarea, button {
+            font: inherit;
+        }
+
+        input, textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: #fff;
+            color: var(--text);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 18px;
+            cursor: pointer;
+            transition: 0.2s ease;
+            font-weight: 700;
+        }
+
+        .primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .primary:hover { background: var(--primary-dark); }
+
+        .secondary {
+            background: #e2e8f0;
+            color: var(--text);
+        }
+
+        .secondary:hover { background: #d7e0ec; }
+
+        .danger {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .danger:hover { background: #fecaca; }
+
+        .status {
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            white-space: pre-wrap;
+            word-break: break-word;
+            display: none;
+        }
+
+        .status.visible {
+            display: block;
+        }
+
+        .status.success {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+            color: #166534;
+        }
+
+        .status.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .response-box {
+            margin-top: 10px;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 10px;
+            min-height: 140px;
+            padding: 14px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-family: Consolas, Monaco, monospace;
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 0 14px 40px; }
+            .card { padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student API Dashboard</h1>
+
+        <div class="grid">
+            <section class="card">
+                <h2>Insert / Update Student</h2>
+
+                <div class="field-group">
+                    <label for="studentId">Student ID (for update)</label>
+                    <input id="studentId" type="number" placeholder="Leave empty for insert" />
+                </div>
+
+                <div class="field-group">
+                    <label for="name">Name</label>
+                    <input id="name" type="text" placeholder="Enter student name" />
+                </div>
+
+                <div class="field-group">
+                    <label for="school">School</label>
+                    <input id="school" type="text" placeholder="Enter school" />
+                </div>
+
+                <div class="field-group">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" placeholder="Enter email" />
+                </div>
+
+                <div class="field-group">
+                    <label for="phone">Phone</label>
+                    <input id="phone" type="text" placeholder="Enter phone" />
+                </div>
+
+                <div class="field-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Enter description"></textarea>
+                </div>
+
+                <div class="button-row">
+                    <button class="primary" id="insertBtn">Insert</button>
+                    <button class="secondary" id="updateBtn">Update</button>
+<!--                    <button class="danger" id="loadBtn">Load All</button>-->
+                </div>
+
+                <div id="studentStatus" class="status"></div>
+<!--                <div id="studentResponse" class="response-box">Response will appear here...</div>-->
+            </section>
+
+            <section class="card">
+                <h2>Ask AI</h2>
+
+                <div class="field-group">
+                    <label for="question">Question</label>
+                    <textarea id="question" placeholder="Ask something to the AI..."></textarea>
+                </div>
+
+                <div class="button-row">
+                    <button class="primary" id="askBtn">Ask AI</button>
+                </div>
+
+                <div id="confirmationButtons" class="button-row" style="display:none; margin-top: 12px;">
+                    <button class="primary" id="confirmActionBtn">Confirm</button>
+                    <button class="danger" id="cancelActionBtn">Cancel</button>
+                </div>
+
+                <div id="askStatus" class="status"></div>
+                <div id="askResponse" class="response-box">AI response will appear here...</div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const baseUrl = '/api';
+        let pendingConfirmation = null;
+
+        function showStatus(el, message, type = 'success') {
+            el.textContent = message;
+            el.classList.add('visible', type);
+        }
+
+        function clearStatus(el) {
+            el.classList.remove('visible', 'success', 'error');
+            el.textContent = '';
+        }
+
+        function getStudentPayload() {
+            return {
+                name: document.getElementById('name').value,
+                school: document.getElementById('school').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                description: document.getElementById('description').value
+            };
+        }
+
+        async function callApi(url, options = {}) {
+            const response = await fetch(url, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+
+            const text = await response.text();
+            let data = text;
+            try {
+                data = text ? JSON.parse(text) : null;
+            } catch (error) {
+                data = text;
+            }
+
+            if (!response.ok) {
+                throw new Error(typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+            }
+
+            return data;
+        }
+
+        document.getElementById('insertBtn').addEventListener('click', async () => {
+            try {
+                clearStatus(document.getElementById('studentStatus'));
+                const data = await callApi(`${baseUrl}/students`, {
+                    method: 'POST',
+                    body: JSON.stringify(getStudentPayload())
+                });
+                document.getElementById('studentResponse').textContent = JSON.stringify(data, null, 2);
+                showStatus(document.getElementById('studentStatus'), 'Student inserted successfully.', 'success');
+            } catch (error) {
+                document.getElementById('studentResponse').textContent = error.message;
+                showStatus(document.getElementById('studentStatus'), 'Insert failed: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('updateBtn').addEventListener('click', async () => {
+            const id = document.getElementById('studentId').value;
+            if (!id) {
+                showStatus(document.getElementById('studentStatus'), 'Please enter Student ID to update.', 'error');
+                return;
+            }
+
+            try {
+                clearStatus(document.getElementById('studentStatus'));
+                const data = await callApi(`${baseUrl}/students/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(getStudentPayload())
+                });
+                document.getElementById('studentResponse').textContent = JSON.stringify(data, null, 2);
+                showStatus(document.getElementById('studentStatus'), 'Student updated successfully.', 'success');
+            } catch (error) {
+                document.getElementById('studentResponse').textContent = error.message;
+                showStatus(document.getElementById('studentStatus'), 'Update failed: ' + error.message, 'error');
+            }
+        });
+
+        const loadBtn = document.getElementById('loadBtn');
+        if (loadBtn) {
+            loadBtn.addEventListener('click', async () => {
+                try {
+                    clearStatus(document.getElementById('studentStatus'));
+                    const data = await callApi(`${baseUrl}/students`, { method: 'GET' });
+                    document.getElementById('studentResponse').textContent = JSON.stringify(data, null, 2);
+                    showStatus(document.getElementById('studentStatus'), 'Students loaded successfully.', 'success');
+                } catch (error) {
+                    document.getElementById('studentResponse').textContent = error.message;
+                    showStatus(document.getElementById('studentStatus'), 'Load failed: ' + error.message, 'error');
+                }
+            });
+        }
+
+        function renderConfirmation(data) {
+            if (!data || !data.actionId || !data.confirmUrl || !data.cancelUrl) {
+                pendingConfirmation = null;
+                document.getElementById('confirmationButtons').style.display = 'none';
+                return false;
+            }
+
+            pendingConfirmation = data;
+            document.getElementById('confirmationButtons').style.display = 'flex';
+            return true;
+        }
+
+        async function confirmPendingAction(confirmed) {
+            if (!pendingConfirmation || !pendingConfirmation.actionId) {
+                showStatus(document.getElementById('askStatus'), 'No pending action to confirm.', 'error');
+                return;
+            }
+
+            const url = confirmed
+                ? `${baseUrl}/askai/confirm?actionId=${encodeURIComponent(pendingConfirmation.actionId)}&confirm=true`
+                : `${baseUrl}/askai/confirm?actionId=${encodeURIComponent(pendingConfirmation.actionId)}&confirm=false`;
+
+            try {
+                const data = await callApi(url, { method: 'POST' });
+                document.getElementById('askResponse').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+                document.getElementById('confirmationButtons').style.display = 'none';
+                pendingConfirmation = null;
+                showStatus(document.getElementById('askStatus'), confirmed ? 'Action confirmed.' : 'Action cancelled.', 'success');
+            } catch (error) {
+                document.getElementById('askResponse').textContent = error.message;
+                showStatus(document.getElementById('askStatus'), 'Action confirmation failed: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('askBtn').addEventListener('click', async () => {
+            const question = document.getElementById('question').value.trim();
+            if (!question) {
+                showStatus(document.getElementById('askStatus'), 'Please enter a question.', 'error');
+                return;
+            }
+
+            try {
+                clearStatus(document.getElementById('askStatus'));
+                const data = await callApi(`${baseUrl}/askai?question=${encodeURIComponent(question)}`, { method: 'GET' });
+                document.getElementById('askResponse').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+
+                if (renderConfirmation(data)) {
+                    showStatus(document.getElementById('askStatus'), 'Please confirm or cancel the action.', 'warning');
+                } else {
+                    showStatus(document.getElementById('askStatus'), 'AI response received successfully.', 'success');
+                }
+            } catch (error) {
+                document.getElementById('askResponse').textContent = error.message;
+                showStatus(document.getElementById('askStatus'), 'AI request failed: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('confirmActionBtn').addEventListener('click', () => confirmPendingAction(true));
+        document.getElementById('cancelActionBtn').addEventListener('click', () => confirmPendingAction(false));
+    </script>
+</body>
+</html>
